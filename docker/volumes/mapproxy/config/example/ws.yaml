@@ -1,0 +1,52 @@
+db_url: postgresql:///?service=giswater_service_example # Postgres connection configuration
+tiling_db_table: tiled.ws_t_tileclusters # Materialized view to store the tileclusters
+data_db_schema: ws # Schema of the data
+crs: EPSG:31982 # Change to the CRS of your data
+log_table: tiled.logs # Table to store update logs
+
+# Tables used to check for updates
+update_tables: [
+  link,
+  arc,
+  connec,
+  node
+]
+
+# Materialized views to be used as sources
+materialized_views: [
+  tiled.ws_t_link,
+  tiled.ws_t_arc,
+  tiled.ws_t_connec,
+  tiled.ws_t_node
+]
+
+# Sources to be used in the mapproxy configuration (QGIS project and layers)
+sources:
+  inventory_source:
+    url: http://qwc-qgis-server/ows/?MAP=/data/ws.qgs&USER=tileuser
+    layers: ws_t_link,ws_t_arc,ws_t_connec,ws_t_node
+
+grid:
+  srs: EPSG:31982
+  origin: nw
+  # mapproxy-util scales -l 10 --as-res-config 20000 --dpi 96
+# The following are just examples, resolution and bbox are defined on make_conf_v2.py
+res: [
+      #  res            level     scale @96.0 DPI
+        52.9166666667, #  0      200000.00000000
+        26.4583333333, #  1      100000.00000000
+        13.2291666667, #  2       50000.00000000
+        5.2916666667, #  3       20000.00000000
+        2.6458333333, #  4       10000.00000000
+        1.3229166667, #  5        5000.00000000
+        0.6614583333, #  6        2500.00000000
+        0.3307291667, #  7        1250.00000000
+        0.1653645833, #  8         625.00000000
+        0.0826822917, #  9         312.50000000
+        0.0413411458, # 10         156.25000000
+        0.0206705729,   #  8          78.12500000
+        0.0103352865, #  9          39.06250000
+  ]
+bbox: [601843, 8128564, 747781, 8208982]
+
+
