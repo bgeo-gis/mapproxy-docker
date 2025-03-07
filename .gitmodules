@@ -1,0 +1,3 @@
+[submodule "mapproxy-service"]
+	path = mapproxy-service
+	url = https://github.com/bgeo-gis/mapproxy-service.git
