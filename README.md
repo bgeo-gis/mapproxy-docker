@@ -210,7 +210,7 @@ password=<password>
 
 This service configuration will be used for Mapproxy and QGIS Server.
 
-> **Note:** For big databases with many concurrent users, we recommend setting up Postgres replication in the QWC2 Server. Follow the documentation in `https://github.com/bgeo-gis/qwc2-docker` for more details.
+> **Note:** For big databases with many concurrent users, we recommend setting up Postgres replication in the QWC2 Server. Follow [this documentation](https://github.com/bgeo-gis/qwc2-docker?tab=readme-ov-file#setting-up-postgresql-replication) for more details.
 
 ### QGIS Project Setup
 
@@ -340,7 +340,7 @@ http://<host>/mapproxy/ws/wmts/1.0.0/WMTSCapabilities.xml
 
 To use the tiled `tileclusters` layers in QWC2, we need a QGIS project to publish.
 
-To do this, install the QGIS plugin [`Tile Manager`](https://github.com/bgeo-gis/tile_manager_qgis_plugin) and follow the [README](https://github.com/bgeo-gis/tile_manager_qgis_plugin?tab=readme-ov-file#tile-manager-plugin) file to set up a publishable QGIS project using the Mapproxy tiled layers.
+To do this, install the QGIS plugin [`Tile Manager`](https://github.com/bgeo-gis/tile_manager_qgis_plugin) and follow [this documentation](https://github.com/bgeo-gis/tile_manager_qgis_plugin?tab=readme-ov-file#tile-manager-plugin) to set up a publishable QGIS project using the Mapproxy tiled layers.
 
 ### Update tiles
 
@@ -361,3 +361,6 @@ This works as follows:
    4. Insert logs in the `tiled.logs` table to keep track of the reseeded tileclusters and geometries.
 4. Create a new `temp/<project>.time` to keep track of the last seed time for future updates.
 
+## Scalability
+
+Although QWC2's multi-tenancy approach is very powerful and configurable, you can have multiple QWC2 instances (servers) consuming the tiles from the Mapproxy server, depending on your needs.
