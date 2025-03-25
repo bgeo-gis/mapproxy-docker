@@ -114,6 +114,7 @@ In the `mapproxy-bgeo` container, configure the directories for storing configur
 Set permissions for `www-data` on the tile directory. Use ACL as follows:
 
 ```sh
+sudo apt-get install -y acl
 sudo setfacl -R -m d:u:www-data:rwx /volumes/mapproxy/tiles
 ```
 > **Note:** If you changed the tile directory to point to another disk or location, set the permissions there.
