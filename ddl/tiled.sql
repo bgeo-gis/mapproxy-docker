@@ -9,6 +9,9 @@ INSERT INTO selector_expl SELECT expl_id ,'tileuser' FROM exploitation WHERE act
 INSERT INTO selector_sector SELECT sector_id ,'tileuser' FROM sector WHERE active is true ON CONFLICT (sector_id, cur_user) DO NOTHING;
 INSERT INTO selector_municipality SELECT muni_id ,'tileuser' FROM ext_municipality WHERE active is true ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
+-- Insert
+INSERT INTO config_param_user VALUES ('inp_options_networkmode', 1,  'tileuser');
+
 -- Create the materialized views in the schema 'tiled'
 -- For WS
 CREATE MATERIALIZED VIEW tiled.ws_t_node AS SELECT * FROM v_edit_node WHERE state < 2;
