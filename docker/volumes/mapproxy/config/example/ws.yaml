@@ -1,8 +1,9 @@
-db_url: postgresql:///?service=giswater_service_example # Postgres connection configuration
-tiling_db_table: tiled.ws_t_tileclusters # Materialized view to store the tileclusters
-data_db_schema: ws # Schema of the data
-crs: EPSG:31982 # Change to the CRS of your data
-log_table: tiled.logs # Table to store update logs
+db_url: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the read-only replica database (pg_service.conf)
+db_url_remtoe: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the master remote database (pg_service.conf)
+tiling_db_table: tiled.ws_t_tileclusters # Materialized view for storing tile clusters
+data_db_schema: ws # Schema containing the data
+crs: EPSG:31982 # Coordinate reference system (CRS) used in your project
+log_table: tiled.logs #  Table for storing update logs
 
 # Tables used to check for updates
 update_tables: [
