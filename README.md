@@ -10,7 +10,7 @@ This guide will help you set up a running instance of Mapproxy. This instance co
 - Docker
 - Nginx
 
-> **Note:** The following installation steps may vary depending on the system or may be out of date. If the required software is already installed, you can skip the installation steps.
+> **Note:** The following installation steps may vary depending on your system or may be outdated. If the required software is already installed, you can skip these steps.
 
 ## Install Docker (Debian)
 
@@ -175,7 +175,7 @@ Similarly, in `qwc-qgis-server`, set the directory for storing QGIS projects if 
 
 ### Database Setup
 
-Mapproxy requires a `tiled` schema in your PostgreSQL database. Follow the `ddl/tiled.sql` file (located in this repository) to:
+Mapproxy requires a `tiled` schema in your PostgreSQL database. Follow the `ddl/tiled.sql` file (included in this repository) to:
 
 1. Create the schema `tiled` and the user `tileuser`.
 2. Create the required materialized views (`ws_t_node`, `ws_t_arc`, `ws_t_connec`, `ws_t_link`).
@@ -216,7 +216,7 @@ This service configuration will be used for Mapproxy and QGIS Server.
 ### QGIS Project Setup
 
 1. Copy your original QGIS project (in this example, the `ws` Giswater project), open it and add the new materialized views as layers.
-2. Apply the main layers' styles to their respective materialized layers (you can do this using the right click from the QGIS TOC):
+2. Apply the main layers styles to their respective materialized counterparts (you can do this using the right click from the QGIS TOC):
    - `v_edit_arc` → `ws_t_arc`
    - `v_edit_node` → `ws_t_node`
    - `v_edit_connec` → `ws_t_connec`
@@ -225,23 +225,26 @@ This service configuration will be used for Mapproxy and QGIS Server.
 4. In **Project > Properties > QGIS Server**, enable **Service Capabilities**, set **Advertised extent**, and configure **CRS restrictions**.
 5. Save the project in the `/docker/qgis-projects` directory.
 
-> **Note:** Check that, using the user `tileuser` with all the selectors active you can see the network properly in the QGIS project. We recomend setting the source as a `service` with the same name as the one in `pg_service.conf`
+> **Note:** Check that, using the user `tileuser` with all the selectors active you can see the network properly in the QGIS project. We recomend setting the source as a `service` with the same name as in `pg_service.conf`
 
 ### Mapproxy Yaml Configuration
 
-1. Create a `.yaml` configuration for the `ws` project (in this repository this is already created as an example).
-2. Rename the `example` folders in `volumes/mapproxy/config` and `volumes/mapproxy/tiles` to match the name for the directories in the `docker-compose.yaml`.
+1. Create a `.yaml` configuration for the `ws` project (an example is already included in this repository).
+2. Rename the `example` folders in `volumes/mapproxy/config` and `volumes/mapproxy/tiles` to match the directory names specified in the `docker-compose.yaml` file.
 
-The `yaml` configuration file is divided in 3 parts:
+The YAML configuration file is divided into three parts:
 
 ```yaml
-db_url: postgresql:///?service=giswater_service_example # Postgres connection configuration (pg_service.conf)
-tiling_db_table: tiled.ws_t_tileclusters # Materialized view to store the tileclusters
-data_db_schema: ws # Schema of the data
-crs: EPSG:31982 # Change to the CRS of your data
-log_table: tiled.logs # Table to store update logs
+db_url: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the read-only replica database (pg_service.conf)
+db_url_remtoe: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the master remote database (pg_service.conf)
+tiling_db_table: tiled.ws_t_tileclusters # Materialized view for storing tile clusters
+data_db_schema: ws # Schema containing the data
+crs: EPSG:31982 # Coordinate reference system (CRS) used in your project
+log_table: tiled.logs #  Table for storing update logs
 ```
-Change the `db_url` with your service name defined in the pg_service.conf file, the `data_db_schema` of the data (Giswater schema), the `crs` for the one used in your project, etc.
+Replace `db_url` and `db_url_remote` with your actual service names defined in the pg_service.conf file. Also update data_db_schema to match the schema where your data (Giswater schema) resides, and set crs to the coordinate system used in your project.
+
+> **Note:** `db_url` and `db_url_remote` are used to differentiate between the master and replica in a PostgreSQL replication setup. If you are using only one database, you can point both to the same service defined in `postgresql.conf`.
 
 ```yaml
 # Tables used to check for updates
@@ -267,9 +270,13 @@ sources:
     layers: ws_t_link,ws_t_arc,ws_t_connec,ws_t_node
 ```
 
-In this second part, the `update_tables` are the parent tables used in the update to check for network object changes. The `materialized_views` are the views in the DB used as sources. In the `source` definition, change the `url` to point to your QGIS project file (only change the name of the project, in this case `ws.qgs`, the rest of the URL should remain the same).
+In this section:
 
-The `layers` are the name of the layers in the QGIS project to use as source.
+- `update_tables` are the parent tables used in the update to detect changes.
+- `materialized_views` are used as data sources.
+- `sources` define how to access QGIS layers via WMS. Where:
+   - `url` points to the QGIS project
+   - `layers` are the name of the layers in the QGIS project to use as source.
 
 ```yaml
 grid:
@@ -295,9 +302,9 @@ res: [
   ]
 bbox: [601843, 8128564, 747781, 8208982]
 ```
-In this last part you should only change the `srs` and `origin` if necessary.
+In this last section change the `srs` and `origin` if needed.
 
-With all these changes, now we can build the docker containers. From the `/docker` directory, run:
+To build the containers, from the `/docker` directory run:
 
 ```sh
 docker compose up -d --build
@@ -305,33 +312,31 @@ docker compose up -d --build
 
 ### Mapproxy dynamic configuration and seed
 
-With all docker containers running, we can now create the final `.yaml` config file that Mapproxy will use to seed. This endpoint uses the base .yaml file to create said file.
-
-Call the endpoint directly from terminal:
+Generate the final `.yaml` file Mapproxy will use to seed:
 ```sh
 curl http://localhost:8098/mapproxy/seeding/generate_config_v2?config=ws
 ```
-The `config` parameter should be the name of the project (in this case `ws`, as our base config file name is `ws.yaml`).
+The `config` parameter should match the name of the project — in this case `ws` (since as tje base config file is named `ws.yaml`).
 
-If the configuration is generated successfully, it will create a new file `docker/mapproxy/config/example/config-out/ws.yaml`, which will be the base file for Mapproxy to seed. In this file there is a layer definition, cache, source and grid for each `tilecluster` in `tiled.ws_t_tileclusters` view.
+The resulting file will be created at: `docker/mapproxy/config/example/config-out/ws.yaml`.
 
-To seed all the network, call the endpoint directly from terminal:
+Seed the network:
 ```sh
 curl http://localhost:8098/mapproxy/seeding/seed/all?config=ws
 ```
 The `config` parameter should be the name of your project (in this case `ws` as our configuration is `ws.yaml`).
 
-> **Note:** The process of seeding the network for the first time could take several hours. The process will create a file `mapproxy_seed_all.log` in `/docker/mapproxy/logs` to show the current seeding process.
+> **Note:** The process of seeding the network for the first time could take several hours. Logs are saved in `/docker/mapproxy/logs/mapproxy_seed_all_log`.
 
-In the `example/temp` folder, a `.time` file will be created to save the last seed timestamp. Also, a `.yaml` file is created for the current layer Mapproxy is seeding.
+During this process, a `.time` file will be created in the `example/temp` folder to record the last seed timestamp. A `.yaml` file is also generated for the current layer Mapproxy is seeding.
 
-The tiles will be saved in the tile directory set in the `docker-compose.yaml` file. Once the process is finished, you can check the individual `tileclusters` layers tiled from the Mapproxy demo site:
+Tiles will be saved in the directory specified in your `docker-compose.yaml` file. Once seeding completes, you can verify the tiled `tileclusters layers` via the Mapproxy demo site:
 
 ```
 http://<host>/mapproxy/ws/demo
 ```
 
-You can also check the `RESTFul capabilities document` URL that will be used for the creation of the QGIS project published in QWC2.
+You can also access the WMTS Capabilities document (used for the QWC2-published QGIS project) at:
 
 ```
 http://<host>/mapproxy/ws/wmts/1.0.0/WMTSCapabilities.xml
@@ -339,29 +344,29 @@ http://<host>/mapproxy/ws/wmts/1.0.0/WMTSCapabilities.xml
 
 ### QGIS Project for publishing in QWC2
 
-To use the tiled `tileclusters` layers in QWC2, we need a QGIS project to publish.
 
-To do this, install the QGIS plugin [`Tile Manager`](https://github.com/bgeo-gis/tile_manager_qgis_plugin) and follow [this documentation](https://github.com/bgeo-gis/tile_manager_qgis_plugin?tab=readme-ov-file#tile-manager-plugin) to set up a publishable QGIS project using the Mapproxy tiled layers.
+Install the QGIS plugin [`Tile Manager`](https://github.com/bgeo-gis/tile_manager_qgis_plugin) and follow [this guide](https://github.com/bgeo-gis/tile_manager_qgis_plugin?tab=readme-ov-file#tile-manager-plugin) to build a QGIS project for publishing in QWC2.
 
 ### Update tiles
 
-Since the network can change and retiling all the network can be slow and time-consuming, we can retile only the changes from the last seed using the following endpoint:
+If the network changes, instead of retiling everything (which is time-consuming), you can update only the modified tiles using:
 
 ```sh
 curl http://localhost:8098/mapproxy/seeding/seed/update?config=ws
 ```
-This works as follows:
+This endpoint works as follows:
 
-1. Gets the last seed time (complete network or update) from the `temp/<project>.time` file.
-2. Refreshes the materialized views used as source (`materialized_views` in the base .yaml config file).
-3. Then for each `tilecluster` in the tilecluster materialized view:
+1. Reads the last seed time (from a full or update seed) from `temp/<project>.time`.
+2. Refreshes the materialized views specified as `materialized_views` in the base .yaml config file.
+3. For each `tilecluster` in the tilecluster materialized view:
 
-   1. Calls the Giswater function `gw_fct_getfeatureboundary` passing the `update_tables` in the base .yaml config file.
-   2. The function returns a `geojson` geometry of the objects that changed since the last seed.
-   3. If the geojson is not empty, reseed the specified tilecluster (using the geojson as the seed coverage).
-   4. Insert logs in the `tiled.logs` table to keep track of the reseeded tileclusters and geometries.
-4. Create a new `temp/<project>.time` to keep track of the last seed time for future updates.
+   1. Calls the `gw_fct_getfeatureboundary` Giswater function, using  `update_tables` from the base .yaml config file.
+   2. The function returns a GeoJSON geometry of features changed since the last seed.
+   3. If the GeoJson is not empty:
+      - Reseeds the tilecluster using the geometry as seed coverage.
+      - Logs details into the  `tiled.logs` table for tracking.
+   4. A new `temp/<project>.time` file is created to record the latest update timestamp.
 
 ## Scalability
 
-Although QWC2's multi-tenancy approach is very powerful and configurable, you can have multiple QWC2 instances (servers) consuming the tiles from the Mapproxy server, depending on your needs.
+QWC2’s multi-tenancy capabilities are powerful and highly configurable. However, for scalability, you can deploy multiple QWC2 instances (servers), all consuming tiles from a single centralized Mapproxy server depending on your system's requirements.
