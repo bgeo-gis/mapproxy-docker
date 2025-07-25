@@ -1,9 +1,9 @@
 db_url: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the read-only replica database (pg_service.conf)
-db_url_remtoe: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the master remote database (pg_service.conf)
-tiling_db_table: tiled.ws_t_tileclusters # Materialized view for storing tile clusters
+db_url_remote: postgresql:///?service=giswater_service_example # PostgreSQL connection configuration for the master remote database (pg_service.conf)
+tiling_db_schema: tiled # Schema containing the tiling data
+tileclusters_table: tiled.ws_t_tileclusters # Materialized view for storing tile clusters
 data_db_schema: ws # Schema containing the data
 crs: EPSG:31982 # Coordinate reference system (CRS) used in your project
-log_table: tiled.logs #  Table for storing update logs
 
 # Tables used to check for updates
 update_tables: [
@@ -21,6 +21,16 @@ materialized_views: [
   tiled.ws_t_node
 ]
 
+# List of selector commands to select what combinations are tiled:
+#  M: Municipality
+#  E: Exploitation
+#  S: Sector
+#  T: sTate
+selectors: [
+  E: true,
+  T: [0, 1],
+]
+
 # Sources to be used in the mapproxy configuration (QGIS project and layers)
 sources:
   inventory_source:
@@ -30,24 +40,22 @@ sources:
 grid:
   srs: EPSG:31982
   origin: nw
-  # mapproxy-util scales -l 10 --as-res-config 20000 --dpi 96
+
 # The following are just examples, resolution and bbox are defined on make_conf_v2.py
+# mapproxy-util scales -l 10 --as-res-config 20000 --dpi 96
 res: [
-      #  res            level     scale @96.0 DPI
-        52.9166666667, #  0      200000.00000000
-        26.4583333333, #  1      100000.00000000
-        13.2291666667, #  2       50000.00000000
-        5.2916666667, #  3       20000.00000000
-        2.6458333333, #  4       10000.00000000
-        1.3229166667, #  5        5000.00000000
-        0.6614583333, #  6        2500.00000000
-        0.3307291667, #  7        1250.00000000
-        0.1653645833, #  8         625.00000000
-        0.0826822917, #  9         312.50000000
-        0.0413411458, # 10         156.25000000
-        0.0206705729, # 11          78.12500000
-        0.0103352865, # 12          39.06250000
-  ]
+# res            level     scale @96.0 DPI
+  5.2916666667, #  0       20000.00000000
+  2.6458333333, #  1       10000.00000000
+  1.3229166667, #  2        5000.00000000
+  0.6614583333, #  3        2500.00000000
+  0.3307291667, #  4        1250.00000000
+  0.1653645833, #  5         625.00000000
+  0.0826822917, #  6         312.50000000
+  0.0413411458, #  7         156.25000000
+  0.0206705729, #  8          78.12500000
+  0.0103352865, #  9          39.06250000
+]
 bbox: [601843, 8128564, 747781, 8208982]
 
 
