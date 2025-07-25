@@ -1,13 +1,27 @@
+-- CREATE USER tileuser WITH PASSWORD '<secure_password>';
+
 -- Create schema 'tiled' to store the materialized views and logs table
+
 CREATE SCHEMA tiled;
 
--- NOTE: Create DB user 'tileuser' in the DB
+-- Table for storing logs of updates tile generation
+CREATE TABLE tiled.logs (
+    id SERIAL PRIMARY KEY,
+    process_id VARCHAR(255) NOT NULL,
+    tilecluster_id VARCHAR(255) NOT NULL,
+    project_id VARCHAR(255) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    geometry GEOMETRY NOT NULL
+);
 
--- Too tile all the network, set the selectors for 'tileuser'
-INSERT INTO selector_state SELECT id ,'tileuser' FROM value_state ON CONFLICT (state_id, cur_user) DO NOTHING;
-INSERT INTO selector_expl SELECT expl_id ,'tileuser' FROM exploitation WHERE active is true ON CONFLICT (expl_id, cur_user) DO NOTHING;
-INSERT INTO selector_sector SELECT sector_id ,'tileuser' FROM sector WHERE active is true ON CONFLICT (sector_id, cur_user) DO NOTHING;
-INSERT INTO selector_municipality SELECT muni_id ,'tileuser' FROM ext_municipality WHERE active is true ON CONFLICT (muni_id, cur_user) DO NOTHING;
+
+-- Table for storing the last seed time for each project
+CREATE TABLE tiled.last_seed_time (
+	id varchar(255) NOT NULL,
+	last_seed timestamp NOT NULL,
+	CONSTRAINT last_seed_time_pkey PRIMARY KEY (id)
+);
 
 -- Insert
 INSERT INTO config_param_user VALUES ('inp_options_networkmode', 1,  'tileuser');
@@ -18,7 +32,6 @@ CREATE MATERIALIZED VIEW tiled.ws_t_node AS SELECT * FROM v_edit_node WHERE stat
 CREATE MATERIALIZED VIEW tiled.ws_t_arc AS SELECT * FROM v_edit_arc WHERE state < 2;
 CREATE MATERIALIZED VIEW tiled.ws_t_connec AS SELECT * FROM v_edit_connec WHERE state < 2;
 CREATE MATERIALIZED VIEW tiled.ws_t_link AS SELECT * FROM v_edit_link WHERE state < 2;
-
 
 -- For UD
 CREATE MATERIALIZED VIEW tiled.ud_t_node AS SELECT * FROM v_edit_node WHERE state < 2;
@@ -31,7 +44,6 @@ CREATE MATERIALIZED VIEW tiled.ud_t_gully AS SELECT * FROM v_edit_gully WHERE st
 -- Create the tilecluster materialized view
 
 -- FOR WS
-
 CREATE MATERIALIZED VIEW tiled.ws_t_tileclusters
 TABLESPACE pg_default
 AS SELECT concat('E', expl_id, '-T', state) AS tilecluster_id,
