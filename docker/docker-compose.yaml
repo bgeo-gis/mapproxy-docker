@@ -15,7 +15,6 @@ services:
       - "127.0.0.1:9090:80"
     volumes:
       - ./pg_service.conf:/srv/pg_service.conf:ro
-      - ./volumes/config:/srv/qwc_service/config:ro
       - ./volumes/mapproxy/config/example:/srv/qwc_service/mapproxy/config # Where the config files are stored
       - ./volumes/mapproxy/tiles/example:/srv/qwc_service/mapproxy/tiles # Where the tiles are stored, recommended to use a fast SSD with plenty of storage
       - ./volumes/mapproxy/logs:/logs
