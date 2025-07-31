@@ -110,11 +110,10 @@ FROM (
     GROUP BY ud_t_link.expl_id, ud_t_link.state
     UNION
     SELECT ud_t_gully.expl_id,
-           ud_t_gully.sector_id,
            ud_t_gully.state,
            st_collect(st_buffer(ud_t_gully.the_geom, 30::double precision)) AS geom
     FROM tiled.ud_t_gully
-    GROUP BY ud_t_gully.expl_id, ud_t_gully.sector_id, ud_t_gully.state
+    GROUP BY ud_t_gully.expl_id, ud_t_gully.state
 ) a
-GROUP BY expl_id, state, sector_id
+GROUP BY expl_id, state
 WITH DATA;
