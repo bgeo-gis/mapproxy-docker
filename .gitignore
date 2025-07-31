@@ -3,3 +3,5 @@ docker/volumes/mapproxy/config/example/temp
 docker/volumes/mapproxy/logs/*
 docker/volumes/mapproxy/tiles/*
 docker/.env
+docker/volumes/mapproxy/config/*/config-out
+docker/volumes/mapproxy/config/*/temp
