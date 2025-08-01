@@ -117,3 +117,72 @@ FROM (
 ) a
 GROUP BY expl_id, state
 WITH DATA;
+
+-- FOR MULTI-NETWORK PROJECTS
+SELECT
+    concat('N', network_id, '-E', expl_id, '-T', state) AS tilecluster_id,
+    network_id,
+    expl_id,
+    state,
+    st_union(geom) AS geom
+FROM (
+    SELECT
+        0 AS network_id,
+        *
+    FROM (
+        SELECT test_ws_t_node.expl_id,
+            test_ws_t_node.state,
+            st_collect(st_buffer(test_ws_t_node.the_geom, 30::double precision)) AS geom
+        FROM tiled.test_ws_t_node
+        GROUP BY test_ws_t_node.expl_id, test_ws_t_node.state
+        UNION
+         SELECT test_ws_t_arc.expl_id,
+            test_ws_t_arc.state,
+            st_collect(st_buffer(test_ws_t_arc.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ws_t_arc
+          GROUP BY test_ws_t_arc.expl_id, test_ws_t_arc.state
+        UNION
+         SELECT test_ws_t_connec.expl_id,
+            test_ws_t_connec.state,
+            st_collect(st_buffer(test_ws_t_connec.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ws_t_connec
+          GROUP BY test_ws_t_connec.expl_id, test_ws_t_connec.state
+        UNION
+         SELECT test_ws_t_link.expl_id,
+            test_ws_t_link.state,
+            st_collect(st_buffer(test_ws_t_link.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ws_t_link
+          GROUP BY test_ws_t_link.expl_id, test_ws_t_link.state
+    )
+    UNION
+    SELECT
+        1 AS network_id,
+        *
+    FROM (
+        SELECT test_ud_t_node.expl_id,
+            test_ud_t_node.state,
+            st_collect(st_buffer(test_ud_t_node.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ud_t_node
+          GROUP BY test_ud_t_node.expl_id, test_ud_t_node.state
+        UNION
+         SELECT test_ud_t_arc.expl_id,
+            test_ud_t_arc.state,
+            st_collect(st_buffer(test_ud_t_arc.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ud_t_arc
+          GROUP BY test_ud_t_arc.expl_id, test_ud_t_arc.state
+        UNION
+         SELECT test_ud_t_connec.expl_id,
+            test_ud_t_connec.state,
+            st_collect(st_buffer(test_ud_t_connec.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ud_t_connec
+          GROUP BY test_ud_t_connec.expl_id, test_ud_t_connec.state
+        UNION
+         SELECT test_ud_t_link.expl_id,
+            test_ud_t_link.state,
+            st_collect(st_buffer(test_ud_t_link.the_geom, 30::double precision)) AS geom
+           FROM tiled.test_ud_t_link
+          GROUP BY test_ud_t_link.expl_id, test_ud_t_link.state
+    )
+)
+GROUP BY network_id, expl_id, state
+
