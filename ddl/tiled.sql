@@ -127,7 +127,7 @@ SELECT
     st_union(geom) AS geom
 FROM (
     SELECT
-        0 AS network_id,
+        1 AS network_id,
         *
     FROM (
         SELECT test_ws_t_node.muni_id,
@@ -156,7 +156,7 @@ FROM (
     )
     UNION
     SELECT
-        1 AS network_id,
+        2 AS network_id,
         *
     FROM (
         SELECT test_ud_t_node.muni_id,

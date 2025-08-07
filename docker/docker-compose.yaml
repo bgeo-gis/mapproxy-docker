@@ -17,6 +17,7 @@ services:
       - ./pg_service.conf:/srv/pg_service.conf:ro
       - ./volumes/mapproxy/config/example:/srv/qwc_service/mapproxy/config # Where the config files are stored
       - ./volumes/mapproxy/tiles/example:/srv/qwc_service/mapproxy/tiles # Where the tiles are stored, recommended to use a fast SSD with plenty of storage
+      - ./volumes/mapproxy/touch_reload:/srv/touch_reload # Used to trigger a reload of the MapProxy configuration
       - ./volumes/mapproxy/logs:/logs
 
   qwc-qgis-server:
