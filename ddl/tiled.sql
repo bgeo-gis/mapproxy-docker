@@ -72,7 +72,20 @@ AS SELECT concat('E', expl_id, '-T', state) AS tilecluster_id,
             ws_t_link.state,
             st_collect(st_buffer(ws_t_link.the_geom, 30::double precision)) AS geom
            FROM tiled.ws_t_link
-          GROUP BY ws_t_link.expl_id, ws_t_link.state) a
+          GROUP BY ws_t_link.expl_id, ws_t_link.state
+        UNION
+         SELECT DISTINCT muni_id,
+            0 AS state,
+            ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1)
+           FROM tiled.test_ws_t_node
+          GROUP by muni_id
+        UNION
+         SELECT DISTINCT muni_id,
+            1 AS state,
+            ST_Buffer(ST_centroid(ST_collect(the_geom)), 1)
+           FROM tiled.test_ws_t_node
+          GROUP BY muni_id
+        ) a
   GROUP BY expl_id, state
 WITH DATA;
 
@@ -114,6 +127,18 @@ FROM (
            st_collect(st_buffer(ud_t_gully.the_geom, 30::double precision)) AS geom
     FROM tiled.ud_t_gully
     GROUP BY ud_t_gully.expl_id, ud_t_gully.state
+        UNION
+         SELECT DISTINCT muni_id,
+            0 AS state,
+            ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1)
+           FROM tiled.test_ud_t_node
+          GROUP by muni_id
+        UNION
+         SELECT DISTINCT muni_id,
+            1 AS state,
+            ST_Buffer(ST_centroid(ST_collect(the_geom)), 1)
+           FROM tiled.test_ud_t_node
+          GROUP BY muni_id
 ) a
 GROUP BY expl_id, state
 WITH DATA;
@@ -153,7 +178,19 @@ FROM (
             st_collect(st_buffer(test_ws_t_link.the_geom, 30::double precision)) AS geom
            FROM tiled.test_ws_t_link
           GROUP BY test_ws_t_link.muni_id, test_ws_t_link.state
-    )
+        UNION
+         SELECT DISTINCT muni_id,
+            0 AS state,
+            ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1)
+           FROM tiled.test_ud_t_node
+          GROUP by muni_id
+        UNION
+         SELECT DISTINCT muni_id,
+            1 AS state,
+            ST_Buffer(ST_centroid(ST_collect(the_geom)), 1)
+           FROM tiled.test_ud_t_node
+          GROUP BY muni_id
+    ) a
     UNION
     SELECT
         2 AS network_id,
@@ -188,7 +225,19 @@ FROM (
             st_collect(st_buffer(test_ud_t_gully.the_geom, 30::double precision)) AS geom
            FROM tiled.test_ud_t_gully
           GROUP BY test_ud_t_gully.muni_id, test_ud_t_gully.state
-    )
+        UNION
+         SELECT DISTINCT muni_id,
+            0 AS state,
+            ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1)
+           FROM tiled.test_ud_t_node
+          GROUP by muni_id
+        UNION
+         SELECT DISTINCT muni_id,
+            1 AS state,
+            ST_Buffer(ST_centroid(ST_collect(the_geom)), 1)
+           FROM tiled.test_ud_t_node
+          GROUP BY muni_id
+    ) a
 )
 GROUP BY network_id, muni_id, state
 

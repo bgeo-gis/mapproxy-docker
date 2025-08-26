@@ -49,8 +49,9 @@ sources:
 grid:
   srs: EPSG:25831
   origin: nw
-  # mapproxy-util scales -l 10 --as-res-config 20000 --dpi 96
+  bbox: [601843, 8128564, 747781, 8208982]
 
+# mapproxy-util scales -l 10 --as-res-config 20000 --dpi 96
 res: [
   #  res            level     scale @96.0 DPI
   52.9166666667, #  0      200000.00000000

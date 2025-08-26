@@ -40,8 +40,8 @@ sources:
 grid:
   srs: EPSG:31982
   origin: nw
+  bbox: [601843, 8128564, 747781, 8208982]
 
-# The following are just examples, resolution and bbox are defined on make_conf_v2.py
 # mapproxy-util scales -l 10 --as-res-config 20000 --dpi 96
 res: [
 # res            level     scale @96.0 DPI
@@ -56,6 +56,5 @@ res: [
   0.0206705729, #  8          78.12500000
   0.0103352865, #  9          39.06250000
 ]
-bbox: [601843, 8128564, 747781, 8208982]
 
 
