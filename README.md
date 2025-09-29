@@ -413,7 +413,7 @@ curl http://localhost:8098/mapproxy/seeding/seed/all?config=ws
 
 Seed update of a specific project (`ws` in this example)
 ```sh
-curl http://localhost:8098/mapproxy/seeding/seed/all?config=ws
+curl http://localhost:8098/mapproxy/seeding/seed/update?config=ws
 ```
 
 Access Mapproxy demo for a specific project (`ws` in this example).
