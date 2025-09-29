@@ -19,6 +19,13 @@ additional_update_tables: [
   node,
 ]
 
+# List of selector commands to select what combinations are tiled:
+#  N: Network
+#  M: Municipality
+#  E: Exploitation
+#  A: Additional Exploitation
+#  S: Sector
+#  T: sTate
 selectors: [
   N: true,
   M: true,

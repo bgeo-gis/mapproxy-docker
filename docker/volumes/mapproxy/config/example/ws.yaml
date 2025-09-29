@@ -24,6 +24,7 @@ materialized_views: [
 # List of selector commands to select what combinations are tiled:
 #  M: Municipality
 #  E: Exploitation
+#  A: Additional Exploitation
 #  S: Sector
 #  T: sTate
 selectors: [
