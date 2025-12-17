@@ -77,13 +77,13 @@ AS SELECT concat('E', expl_id, '-T', state) AS tilecluster_id,
          SELECT DISTINCT muni_id,
             0 AS state,
             ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ws_t_node
+           FROM tiled.ws_t_node
           GROUP by muni_id
         UNION ALL
          SELECT DISTINCT muni_id,
             1 AS state,
             ST_Buffer(ST_centroid(ST_collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ws_t_node
+           FROM tiled.ws_t_node
           GROUP BY muni_id
         ) a
   GROUP BY expl_id, state
@@ -131,13 +131,13 @@ FROM (
          SELECT DISTINCT muni_id,
             0 AS state,
             ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ud_t_node
+           FROM tiled.ud_t_node
           GROUP by muni_id
         UNION ALL
          SELECT DISTINCT muni_id,
             1 AS state,
             ST_Buffer(ST_centroid(ST_collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ud_t_node
+           FROM tiled.ud_t_node
           GROUP BY muni_id
 ) a
 GROUP BY expl_id, state
@@ -155,40 +155,40 @@ FROM (
         1 AS network_id,
         *
     FROM (
-        SELECT test_ws_t_node.muni_id,
-            test_ws_t_node.state,
-            st_collect(ST_Buffer(test_ws_t_node.the_geom, 30, 'quad_segs=1')) AS geom
-        FROM tiled.test_ws_t_node
-        GROUP BY test_ws_t_node.muni_id, test_ws_t_node.state
+        SELECT ws_t_node.muni_id,
+            ws_t_node.state,
+            st_collect(ST_Buffer(ws_t_node.the_geom, 30, 'quad_segs=1')) AS geom
+        FROM tiled.ws_t_node
+        GROUP BY ws_t_node.muni_id, ws_t_node.state
         UNION ALL
-         SELECT test_ws_t_arc.muni_id,
-            test_ws_t_arc.state,
-            st_collect(ST_Buffer(test_ws_t_arc.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ws_t_arc
-          GROUP BY test_ws_t_arc.muni_id, test_ws_t_arc.state
+         SELECT ws_t_arc.muni_id,
+            ws_t_arc.state,
+            st_collect(ST_Buffer(ws_t_arc.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ws_t_arc
+          GROUP BY ws_t_arc.muni_id, ws_t_arc.state
         UNION ALL
-         SELECT test_ws_t_connec.muni_id,
-            test_ws_t_connec.state,
-            st_collect(ST_Buffer(test_ws_t_connec.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ws_t_connec
-          GROUP BY test_ws_t_connec.muni_id, test_ws_t_connec.state
+         SELECT ws_t_connec.muni_id,
+            ws_t_connec.state,
+            st_collect(ST_Buffer(ws_t_connec.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ws_t_connec
+          GROUP BY ws_t_connec.muni_id, ws_t_connec.state
         UNION ALL
-         SELECT test_ws_t_link.muni_id,
-            test_ws_t_link.state,
-            st_collect(ST_Buffer(test_ws_t_link.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ws_t_link
-          GROUP BY test_ws_t_link.muni_id, test_ws_t_link.state
+         SELECT ws_t_link.muni_id,
+            ws_t_link.state,
+            st_collect(ST_Buffer(ws_t_link.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ws_t_link
+          GROUP BY ws_t_link.muni_id, ws_t_link.state
         UNION ALL
          SELECT DISTINCT muni_id,
             0 AS state,
             ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ud_t_node
+           FROM tiled.ws_t_node
           GROUP by muni_id
         UNION ALL
          SELECT DISTINCT muni_id,
             1 AS state,
             ST_Buffer(ST_centroid(ST_collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ud_t_node
+           FROM tiled.ws_t_node
           GROUP BY muni_id
     ) a
     UNION ALL
@@ -196,46 +196,46 @@ FROM (
         2 AS network_id,
         *
     FROM (
-        SELECT test_ud_t_node.muni_id,
-            test_ud_t_node.state,
-            st_collect(ST_Buffer(test_ud_t_node.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ud_t_node
-          GROUP BY test_ud_t_node.muni_id, test_ud_t_node.state
+        SELECT ud_t_node.muni_id,
+            ud_t_node.state,
+            st_collect(ST_Buffer(ud_t_node.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ud_t_node
+          GROUP BY ud_t_node.muni_id, ud_t_node.state
         UNION ALL
-         SELECT test_ud_t_arc.muni_id,
-            test_ud_t_arc.state,
-            st_collect(ST_Buffer(test_ud_t_arc.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ud_t_arc
-          GROUP BY test_ud_t_arc.muni_id, test_ud_t_arc.state
+         SELECT ud_t_arc.muni_id,
+            ud_t_arc.state,
+            st_collect(ST_Buffer(ud_t_arc.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ud_t_arc
+          GROUP BY ud_t_arc.muni_id, ud_t_arc.state
         UNION ALL
-         SELECT test_ud_t_connec.muni_id,
-            test_ud_t_connec.state,
-            st_collect(ST_Buffer(test_ud_t_connec.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ud_t_connec
-          GROUP BY test_ud_t_connec.muni_id, test_ud_t_connec.state
+         SELECT ud_t_connec.muni_id,
+            ud_t_connec.state,
+            st_collect(ST_Buffer(ud_t_connec.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ud_t_connec
+          GROUP BY ud_t_connec.muni_id, ud_t_connec.state
         UNION ALL
-         SELECT test_ud_t_link.muni_id,
-            test_ud_t_link.state,
-            st_collect(ST_Buffer(test_ud_t_link.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ud_t_link
-          GROUP BY test_ud_t_link.muni_id, test_ud_t_link.state
+         SELECT ud_t_link.muni_id,
+            ud_t_link.state,
+            st_collect(ST_Buffer(ud_t_link.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ud_t_link
+          GROUP BY ud_t_link.muni_id, ud_t_link.state
         UNION ALL
-         SELECT test_ud_t_gully.muni_id,
-            test_ud_t_gully.state,
-            st_collect(ST_Buffer(test_ud_t_gully.the_geom, 30, 'quad_segs=1')) AS geom
-           FROM tiled.test_ud_t_gully
-          GROUP BY test_ud_t_gully.muni_id, test_ud_t_gully.state
+         SELECT ud_t_gully.muni_id,
+            ud_t_gully.state,
+            st_collect(ST_Buffer(ud_t_gully.the_geom, 30, 'quad_segs=1')) AS geom
+           FROM tiled.ud_t_gully
+          GROUP BY ud_t_gully.muni_id, ud_t_gully.state
         UNION ALL
          SELECT DISTINCT muni_id,
             0 AS state,
             ST_Buffer(ST_Centroid(ST_Collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ud_t_node
+           FROM tiled.ud_t_node
           GROUP by muni_id
         UNION ALL
          SELECT DISTINCT muni_id,
             1 AS state,
             ST_Buffer(ST_centroid(ST_collect(the_geom)), 1, 'quad_segs=1')
-           FROM tiled.test_ud_t_node
+           FROM tiled.ud_t_node
           GROUP BY muni_id
     ) a
 )
